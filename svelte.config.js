@@ -11,9 +11,11 @@ const config = {
   preprocess: sveltePreprocess({
     scss: {
       // prependData: `@import 'src/styles/_functions';`
-      prependData: `@use 'src/styles/_functions' as *;`
+      prependData: `@use 'src/styles/_functions' as *;`,
       // prependData: `@use 'src/styles/_functions' as functions;`
-    }
+    },
+    typescript: true
+
   }),
 
   kit: {
@@ -23,6 +25,7 @@ const config = {
     adapter: adapter(),
     alias: {
       '$components': 'src/lib/components',
+      '$assets': 'src/assets',
     }
   }
 };
