@@ -38,8 +38,8 @@
 
 <div class="nav-content" class:desktop class:mobile={!desktop}>
   <nav aria-label="Main">
-    <div class="nva-content-inner">
-      <img src={logo} class="logo" alt="spotify" width="100px" />
+    <div class="nav-content-inner">
+      <img src={logo} class="logo" alt="spotify" />
       <ul>
         {#each menuItems as item}
           <li class:active={item.path === $page.url.pathname}>
@@ -60,3 +60,61 @@
     </div>
   </nav>
 </div>
+
+<style lang="scss">
+  @use "@unsass/breakpoint";
+  .nav-content {
+    .logo {
+      max-width: 100%;
+      width: 130px;
+    }
+    .nav-content-inner {
+      padding: 20px;
+      min-width: var(--sidebar-width);
+      background-color: var(--sidebar-color);
+      height: 100vh;
+      overflow: hidden;
+      display: none;
+      ul {
+        padding: 0;
+        margin: 20px 0 0;
+        list-style: none;
+        li {
+          &.active {
+            a {
+              opacity: 1;
+            }
+          }
+          a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: toRem(14);
+            font-weight: 500;
+            padding: 5px;
+            margin: 10px 0;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            &:hover,
+            &focus {
+              opacity: 1;
+            }
+            :global(svg) {
+              margin-right: 12px;
+            }
+          }
+        }
+      }
+    }
+    &.desktop {
+      position: sticky;
+      top: 0;
+      .nav-content-inner {
+        @include breakpoint.up("md") {
+          display: block;
+        }
+      }
+    }
+  }
+</style>
