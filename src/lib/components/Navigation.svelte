@@ -14,6 +14,7 @@
 
   let openMenuButton: HTMLButtonElement;
   let closeMenuButton: HTMLButtonElement;
+  let focusableElement: HTMLAnchorElement;
 
   interface IconProps {
     size?: number | string;
