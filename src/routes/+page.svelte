@@ -5,6 +5,7 @@
 </p>
 
 <input />
+<div style="height: 1000px" />
 <select>
   <option>Option</option>
 </select>
