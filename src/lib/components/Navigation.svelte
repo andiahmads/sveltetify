@@ -1,20 +1,21 @@
 <script lang="ts">
   import type { SvelteComponent } from "svelte";
   import logo from "$assets/logo.png";
-  import { Home, Search, ListMusic } from "lucide-svelte";
+  import { Home, Search, ListMusic, Menu, X } from "lucide-svelte";
   import { page } from "$app/stores";
   import { fade } from "svelte/transition";
   import { tick } from "svelte";
   import { beforeNavigate } from "$app/navigation";
+  import { IconButton } from "$components";
 
   export let desktop: boolean;
   let isMobileMenuOpen = false;
 
   $: isOpen = desktop || isMobileMenuOpen;
 
-  let openMenuButton: HTMLButtonElement;
-  let closeMenuButton: HTMLButtonElement;
-  let focusableElement: HTMLAnchorElement;
+  let openMenuButton: IconButton;
+  let closeMenuButton: IconButton;
+  let lastFocusableElement: HTMLAnchorElement;
 
   interface IconProps {
     size?: number | string;
@@ -48,13 +49,35 @@
   const openMenu = async () => {
     isMobileMenuOpen = true;
     await tick(); // Tunggu hingga DOM diperbarui
-    closeMenuButton.focus();
+    closeMenuButton.getButton().focus();
   };
 
   const closeMenu = async () => {
     isMobileMenuOpen = false;
     await tick();
-    openMenuButton.focus();
+    openMenuButton.getButton().focus();
+  };
+
+  const moveFocusToButton = (e: KeyboardEvent) => {
+    if (desktop) return;
+    if (e.key === "Tab" && e.shiftKey) {
+      e.preventDefault();
+      lastFocusableElement.focus();
+    }
+  };
+
+  const moveFocusToTop = (e: KeyboardEvent) => {
+    if (desktop) return;
+    if (e.key === "Tab" && !e.shiftKey) {
+      e.preventDefault();
+      closeMenuButton.getButton().focus();
+    }
+  };
+
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      closeMenu();
+    }
   };
 
   beforeNavigate(() => {
@@ -75,42 +98,65 @@
   {#if !desktop && isMobileMenuOpen}
     <div
       class="overlay"
+      on:keyup={handleEscape}
       on:click={closeMenu}
       transition:fade={{ duration: 200 }}
     />
   {/if}
   <nav aria-label="Main">
     {#if !desktop}
-      <button
+      <IconButton
+        icon={Menu}
+        label="open menu"
         bind:this={openMenuButton}
         on:click={openMenu}
-        aria-expanded={isOpen}>open</button
-      >
+        aria-expanded={isOpen}
+        class="menu-button"
+      />
     {/if}
     <div
       class="nav-content-inner"
       class:is-hidden={!isOpen}
       style:visibility={isOpen ? "visible" : "hidden"}
+      on:keyup={handleEscape}
     >
       {#if !desktop}
-        <button bind:this={closeMenuButton} on:click={closeMenu}>close</button>
+        <IconButton
+          icon={X}
+          label="close menu"
+          bind:this={closeMenuButton}
+          on:click={closeMenu}
+          aria-expanded={isOpen}
+          class="close-menu-button"
+        />
       {/if}
 
       <img src={logo} class="logo" alt="spotify" />
       <ul>
-        {#each menuItems as item}
+        {#each menuItems as item, index}
+          {@const iconProps = {
+            focusable: "false",
+            "aria-hidden": true,
+            color: "var(--text-color)",
+            size: 26,
+            strokeWidth: 2,
+          }}
           <li class:active={item.path === $page.url.pathname}>
-            <a href={item.path}>
-              <svelte:component
-                this={item.icon}
-                focusable="false"
-                aria-hidden="true"
-                color="var(--text-color)"
-                size={26}
-                strokeWidth={2}
-              />
-              {item.label}
-            </a>
+            {#if menuItems.length === index + 1}
+              <a
+                bind:this={lastFocusableElement}
+                href={item.path}
+                on:keydown={moveFocusToTop}
+              >
+                <svelte:component this={item.icon} {...iconProps} />
+                {item.label}
+              </a>
+            {:else}
+              <a href={item.path}>
+                <svelte:component this={item.icon} {...iconProps} />
+                {item.label}
+              </a>
+            {/if}
           </li>
         {/each}
       </ul>
@@ -206,6 +252,16 @@
       @include breakpoint.down("md") {
         display: block;
       }
+    }
+    :global(.menu-button) {
+      @include breakpoint.up("md") {
+        display: none;
+      }
+    }
+    :global(.close-menu-button) {
+      position: absolute;
+      right: 20px;
+      top: 20px;
     }
   }
 </style>

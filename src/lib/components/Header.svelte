@@ -1,10 +1,13 @@
 <script>
+  import { browser } from "$app/environment";
   import { Navigation } from "$components";
 </script>
 
 <div class="content">
   <div class="left">
-    <Navigation desktop={false} />
+    {#if browser}
+      <Navigation desktop={false} />
+    {/if}
   </div>
   <div class="right">right</div>
 </div>
@@ -14,6 +17,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     // height: 100vh;
     // background-color: var(--bg-color);
   }
