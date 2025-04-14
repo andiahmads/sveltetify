@@ -15,6 +15,7 @@
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/nprogress": "^0.2.3",
 		"sass": "^1.86.0",
 		"sass-embedded": "^1.86.0",
 		"svelte": "^5.0.0",
@@ -29,6 +30,8 @@
 		"@unsass/breakpoint": "^2.4.0",
 		"lucide-svelte": "^0.487.0",
 		"modern-normalize": "^3.0.1",
-		"pkce-gen": "^1.1.0"
+		"nprogress": "^0.2.0",
+		"pkce-gen": "^1.1.0",
+		"tippy.js": "^6.3.7"
 	}
 }

@@ -2,7 +2,12 @@
   import "modern-normalize/modern-normalize.css";
   import "../styles/main.scss";
   import type { LayoutData } from "./$types";
+  import { page } from "$app/stores";
   import { Navigation, Header } from "$components";
+  import NProgress from "nprogress";
+  import "nprogress/nprogress.css";
+
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
 
   let topbar: HTMLElement;
   let scrollY: number;
@@ -15,9 +20,25 @@
 
   export let data: LayoutData;
   $: user = data.user;
+
+  afterNavigate(() => {
+    NProgress.done();
+  });
+
+  beforeNavigate(() => {
+    NProgress.start();
+  });
+
+  NProgress.configure({ showSpinner: false });
 </script>
 
 <svelte:window bind:scrollY />
+<svelte:head>
+  <title>Sveltetiy{$page.data.title ? `-${$page.data.title}` : ""}</title>
+</svelte:head>
+{#if user}
+  <a href="#main-content" class="skip-link">Skip to Content</a>
+{/if}
 
 <div id="main">
   {#if user}
@@ -26,14 +47,16 @@
     </div>
   {/if}
   <div id="content">
-    <div id="topbar" bind:this={topbar}>
-      <div
-        class="topbar-bg"
-        style:background-color="var(--header-color)"
-        style:opacity={`${headerOpacity}`}
-      />
-      <Header />
-    </div>
+    {#if user}
+      <div id="topbar" bind:this={topbar}>
+        <div
+          class="topbar-bg"
+          style:background-color="var(--header-color)"
+          style:opacity={`${headerOpacity}`}
+        />
+        <Header />
+      </div>
+    {/if}
     <main id="main-content" class:logged-in={user}>
       <slot />
     </main>
