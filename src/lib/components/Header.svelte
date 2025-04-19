@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { browser } from "$app/environment";
-  import { Navigation, LogoutButton } from "$components";
+  import { LogoutButton, Navigation } from "$components";
   import { page } from "$app/stores";
   import { ChevronDown, ExternalLink } from "lucide-svelte";
   import { tippy } from "$actions";
@@ -30,57 +30,61 @@
           placement: "bottom-end",
           interactive: true,
           theme: "menu",
+          hideOnPopperBlur: true,
         }}
       >
         {#if user?.images && user.images.length > 0}
           <img src={user.images[0].url} alt="" />
         {/if}
-        {user?.display_name}
-        <!-- <span class="visually-hiden">profile menu</span> -->
+        {user?.display_name} <span class="visually-hidden">Profile menu</span>
         <ChevronDown class="profile-arrow" size={22} />
       </button>
+    </div>
+    <div id="profile-menu" style="display: none;">
+      <div class="profile-menu-content">
+        <ul>
+          <li>
+            <a
+              href={user?.external_urls.spotify}
+              target="_blank"
+              rel="noopener noreferrer"
+              >View on Spotify
+              <ExternalLink focusable="false" aria-hidden size={20} />
+            </a>
+          </li>
+          <li><a href="/profile">View Profile</a></li>
+          <li><LogoutButton /></li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="profile-menu" style="display: none;">
-  <div class="profile-menu-content">
-    <ul>
-      <li>
-        <a
-          href={user?.external_urls.spotify}
-          target="_blank"
-          rel="noopener noreferrer"
-          >View on Spotify
-          <ExternalLink focusable="false" aria-hidden size={20} />
-        </a>
-      </li>
-      <li>
-        <a href="/pofile">View Profile</a>
-      </li>
-      <li>
-        <LogoutButton />
-      </li>
-    </ul>
-  </div>
-</div>
-
 <style lang="scss">
+  @use "@unsass/breakpoint";
   .content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    :global(html.no-js) & {
+      @include breakpoint.down("md") {
+        justify-content: flex-start;
+      }
+    }
   }
   .profile-button {
     background: none;
-    border: 1px solid(--border);
+    border: 1px solid var(--border);
     padding: 5px;
     border-radius: 25px;
     display: flex;
     align-items: center;
     color: var(--text-color);
     cursor: pointer;
+    :global(html.no-js) & {
+      display: none;
+    }
     :global(.profile-arrow) {
       margin-left: 3px;
     }
@@ -124,4 +128,17 @@
       }
     }
   }
+  :global(html.no-js) #profile-menu {
+    display: block !important;
+    .profile-menu-content {
+      ul {
+        padding: 0;
+        margin: 0;
+        li {
+          display: inline-block;
+        }
+      }
+    }
+  }
 </style>
+

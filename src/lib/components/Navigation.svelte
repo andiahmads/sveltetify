@@ -189,8 +189,14 @@
       min-width: var(--sidebar-width);
       background-color: var(--sidebar-color);
       height: 100vh;
-      overflow: hidden;
+      overflow: auto;
       display: none;
+      :global(html.no-js) & {
+        @include breakpoint.down("md") {
+          display: block;
+          height: auto;
+        }
+      }
       ul {
         padding: 0;
         margin: 20px 0 0;
@@ -213,7 +219,7 @@
             opacity: 0.7;
             transition: opacity 0.2s;
             &:hover,
-            &focus {
+            &:focus {
               opacity: 1;
             }
             :global(svg) {
@@ -240,7 +246,6 @@
       transition:
         transform 200ms,
         opacity 200ms;
-      visibility: 200ms;
       &.is-hidden {
         transition:
           transform 200ms,

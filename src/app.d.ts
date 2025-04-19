@@ -14,3 +14,8 @@ declare global {
 }
 
 export { };
+
+
+declare interface window {
+  refreshPromise: Promise<Response> | null;
+}

@@ -1,26 +1,75 @@
-<h1>Welcome to SvelteKit</h1>
-<p>
-  Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the
-  documentation
-</p>
+<script lang="ts">
+  import Button from "$components/Button.svelte";
+  import type { PageData } from "./$types";
 
-<input />
-<div style="height: 1000px" />
-<select>
-  <option>Option</option>
-</select>
-<button>Button</button>
+  export let data: PageData;
 
-<style lang="scss">
-  @use "@unsass/breakpoint";
-  h1 {
-    color: red;
-    font-size: toRem(50);
-    @include breakpoint.up("md") {
-      color: green;
+  let sections: {
+    title: string;
+    path: string;
+    items: (
+      | SpotifyApi.AlbumObjectSimplified
+      | SpotifyApi.PlaylistObjectSimplified
+    )[];
+  }[] = [];
+
+  $: {
+    if (data.newRelease) {
+      sections.push({
+        title: "New Releases",
+        path: "sections/new-releases",
+        items: data.newRelease.albums.items,
+      });
     }
-    @include breakpoint.up("lg") {
-      color: blue;
+    if (data.featurePlaylist) {
+      sections.push({
+        title: "Featured Playlists",
+        path: "sections/featured-playlists",
+        items: data.featurePlaylist.playlists.items,
+      });
+    }
+
+    data.homeCategories.forEach((category, index) => {
+      const categoryPlaylist = data.categoriesPlaylists[index];
+      if (categoryPlaylist) {
+        sections.push({
+          title: category.name,
+          path: `/category/${category.id}`,
+          items: categoryPlaylist.playlists.items,
+        });
+      }
+    });
+
+    if (data.userPlaylist) {
+      sections.push({
+        title: "your playlists",
+        path: "playlists",
+        items: data.userPlaylist.items,
+      });
     }
   }
-</style>
+  $: console.log(sections);
+</script>
+
+{#each sections as section}
+  <section class="content-row">
+    <div class="content-row-header">
+      <div class="right">
+        <h2 class="section-title">{section.title}</h2>
+      </div>
+      <div class="left">
+        <Button element="a" href={section.path} variant="outline"
+          >See All <span class="visually-hidden">{section.title}</span></Button
+        >
+      </div>
+    </div>
+    <div class="grid-items">
+      {#each section.items as item}
+        <div class="grid-item">
+          <h5>{item.type}</h5>
+          <h3>{item.name}</h3>
+        </div>
+      {/each}
+    </div>
+  </section>
+{/each}
